@@ -192,6 +192,9 @@ void ra8875_enable_display(bool enable)
     ESP_LOGI(TAG, "%s display.", enable ? "Enabling" : "Disabling");
     uint8_t val = enable ? (0x80) : (0x00);
     ra8875_write_cmd(RA8875_REG_PWRR, val);            // Power and Display Control Register (PWRR)
+    ra8875_write_cmd(0x8A, 0x80 | (0x0A & 0xF));
+    ra8875_write_cmd(0x8B, 255);
+    ra8875_write_cmd(0xC7, 1);
 }
 
 
