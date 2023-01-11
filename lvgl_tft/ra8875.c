@@ -240,6 +240,11 @@ void ra8875_flush(lv_disp_drv_t * drv, const lv_area_t * area, lv_color_t * colo
         y = 0;
     }
 
+    for (int i = 0; i < (area->y2 - area->y1 + 1)*linelen; i++) {
+        uint16_t low = color_map[i].full & 0xFF;
+        uint16_t high = (color_map[i].full >> 8) & 0xFF;
+        color_map[i].full = ((low << 8) | high);
+    }
     // Write data
     ra8875_send_buffer(buffer, (area->y2 - area->y1 + 1)*BYTES_PER_PIXEL*linelen, true);
 
