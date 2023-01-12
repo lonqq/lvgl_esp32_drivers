@@ -313,7 +313,10 @@ static void IRAM_ATTR spi_ready(spi_transaction_t *trans)
 #if LVGL_VERSION_MAJOR < 8
         lv_disp_flush_ready(&disp->driver);
 #else
-        lv_disp_flush_ready(disp->driver);
+        if (NULL != disp->driver->draw_buf) {
+            // If drawing through lv_canvas with a fake disp, there is no draw_buf
+            lv_disp_flush_ready(disp->driver);
+        }
 #endif
 
     }
