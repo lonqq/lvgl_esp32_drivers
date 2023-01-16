@@ -7,7 +7,12 @@ list(APPEND SOURCES "lvgl_tft/esp_lcd_backlight.c")
 
 # Include only the source file of the selected
 # display controller.
-if(CONFIG_LV_TFT_DISPLAY_CONTROLLER_ILI9341)
+if(CONFIG_LV_TFT_DISPLAY_PROTOCOL_MCU)
+    list(APPEND SOURCES "lvgl_tft/disp_mcu.c")
+    if(CONFIG_LV_TFT_DISPLAY_CONTROLLER_HX8357)
+        list(APPEND SOURCES "lvgl_tft/esp_lcd_panel_hx8357.c")
+    endif()
+elseif(CONFIG_LV_TFT_DISPLAY_CONTROLLER_ILI9341)
     list(APPEND SOURCES "lvgl_tft/ili9341.c")
 elseif(CONFIG_LV_TFT_DISPLAY_CONTROLLER_ILI9481)
     list(APPEND SOURCES "lvgl_tft/ili9481.c")
@@ -86,7 +91,7 @@ endif()
 
 idf_component_register(SRCS ${SOURCES}
                        INCLUDE_DIRS ${LVGL_INCLUDE_DIRS}
-                       REQUIRES lvgl)
+                       REQUIRES lvgl esp_lcd)
 
 target_compile_definitions(${COMPONENT_LIB} PUBLIC "-DLV_LVGL_H_INCLUDE_SIMPLE")
 

@@ -43,6 +43,10 @@ menu "LVGL TFT Display controller"
             bool "Adafruit 3.5 Featherwing"
             select LV_TFT_DISPLAY_CONTROLLER_HX8357
             select LV_TFT_DISPLAY_PROTOCOL_SPI
+        config LV_PREDEFINED_DISPLAY_ADA_FEATHERWING_MCU
+            bool "Adafruit 3.5 Featherwing Parralel Bus"
+            select LV_TFT_DISPLAY_CONTROLLER_HX8357
+            select LV_TFT_DISPLAY_PROTOCOL_MCU
        config LV_PREDEFINED_DISPLAY_RPI_MPI3501
             bool "RPi MPI3501"
             select LV_TFT_DISPLAY_CONTROLLER_ILI9486
@@ -186,15 +190,84 @@ menu "LVGL TFT Display controller"
     # - Know what peripherals to initialize.
     # - Know if the touch and display controllers share the same peripheral.
     # - Etc.
+    config LV_TFT_DISPLAY_PROTOCOL_MCU
+        bool "Use parallel bus"
+        help
+            Display controller protocol MCU
+        default n
+
     config LV_TFT_DISPLAY_PROTOCOL_SPI
-        bool
+        bool "Use SPI protocol"
         help
             Display controller protocol SPI
+        default n
 
     config LV_I2C_DISPLAY
         bool
         help
             Display controller protocol I2C
+
+    menu "Parralel buf Configuration"
+    visible if LV_TFT_DISPLAY_PROTOCOL_MCU
+
+        choice PARALLEL_BUS_WIDTH
+            prompt "Parallel bus width"
+            config LV_TFT_MCU_BUS_WIDTH_8
+                bool "8 bits"
+            config LV_TFT_MCU_BUS_WIDTH_16
+                bool "16 bits"
+        endchoice
+
+        config LV_TFT_LCD_CMD_WIDTH_16
+            bool "LCD CMD 16 bits"
+            default n if LV_TFT_DISPLAY_CONTROLLER_HX8357
+        config LV_TFT_LCD_PARAM_WIDTH_16
+            bool "LCD Param 16 bits"
+            default n if LV_TFT_DISPLAY_CONTROLLER_HX8357
+
+        config LV_TFT_MCU_RST_NUM
+            int "GPIO Num for RST"
+            default -1
+        config LV_TFT_MCU_CS_NUM
+            int "GPIO Num for CS"
+        config LV_TFT_MCU_DC_NUM
+            int "GPIO Num for DC"
+        config LV_TFT_MCU_WR_NUM
+            int "GPIO Num for WR"
+
+        config LV_TFT_MCU_DATA0
+            int "GPIO Num for DATA0"
+        config LV_TFT_MCU_DATA1
+            int "GPIO Num for DATA1"
+        config LV_TFT_MCU_DATA2
+            int "GPIO Num for DATA3"
+        config LV_TFT_MCU_DATA3
+            int "GPIO Num for DATA3"
+        config LV_TFT_MCU_DATA4
+            int "GPIO Num for DATA4"
+        config LV_TFT_MCU_DATA5
+            int "GPIO Num for DATA5"
+        config LV_TFT_MCU_DATA6
+            int "GPIO Num for DATA6"
+        config LV_TFT_MCU_DATA7
+            int "GPIO Num for DATA7"
+        config LV_TFT_MCU_DATA8
+            int "GPIO Num for DATA8" if LV_TFT_MCU_BUS_WIDTH_16
+        config LV_TFT_MCU_DATA9
+            int "GPIO Num for DATA9" if LV_TFT_MCU_BUS_WIDTH_16
+        config LV_TFT_MCU_DATA10
+            int "GPIO Num for DATA10" if LV_TFT_MCU_BUS_WIDTH_16
+        config LV_TFT_MCU_DATA11
+            int "GPIO Num for DATA11" if LV_TFT_MCU_BUS_WIDTH_16
+        config LV_TFT_MCU_DATA12
+            int "GPIO Num for DATA12" if LV_TFT_MCU_BUS_WIDTH_16
+        config LV_TFT_MCU_DATA13
+            int "GPIO Num for DATA13" if LV_TFT_MCU_BUS_WIDTH_16
+        config LV_TFT_MCU_DATA14
+            int "GPIO Num for DATA14" if LV_TFT_MCU_BUS_WIDTH_16
+        config LV_TFT_MCU_DATA15
+            int "GPIO Num for DATA15" if LV_TFT_MCU_BUS_WIDTH_16
+    endmenu
 
     # Used in display init function to send display orientation commands
     choice DISPLAY_ORIENTATION

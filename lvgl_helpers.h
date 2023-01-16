@@ -100,6 +100,8 @@ void lvgl_driver_init(void);
 bool lvgl_spi_driver_init(int host, int miso_pin, int mosi_pin, int sclk_pin,
     int max_transfer_sz, int dma_channel, int quadwp_pin, int quadhd_pin);
 
+void disp_mcu_panel_init(lv_disp_drv_t *disp_drv);
+
 /**********************
  *      MACROS
  **********************/
