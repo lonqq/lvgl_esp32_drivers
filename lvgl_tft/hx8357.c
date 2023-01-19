@@ -236,6 +236,10 @@ void hx8357_flush(lv_disp_drv_t * drv, const lv_area_t * area, lv_color_t * colo
 
 	/*Memory write*/
 	hx8357_send_cmd(HX8357_RAMWR);
+  for (int i = 0; i < size; i++) {
+    uint16_t c = color_map[i].full;
+    color_map[i].full = ((c & 0x00FF) << 8) | ((c & 0xFF00) >> 8);
+  }
 	hx8357_send_color((void*)color_map, size * 2);
 }
 
