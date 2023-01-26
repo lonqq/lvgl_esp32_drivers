@@ -296,6 +296,7 @@ void disp_spi_release(void)
 /**********************
  *   STATIC FUNCTIONS
  **********************/
+lv_disp_drv_t *active_drv;
 
 static void IRAM_ATTR spi_ready(spi_transaction_t *trans)
 {
@@ -316,6 +317,10 @@ static void IRAM_ATTR spi_ready(spi_transaction_t *trans)
         if (NULL != disp->driver->draw_buf) {
             // If drawing through lv_canvas with a fake disp, there is no draw_buf
             lv_disp_flush_ready(disp->driver);
+        } else if (NULL != active_drv && NULL != active_drv->draw_buf) {
+            // It is not reliable to use the disp_refreshing above. It may cause some deadlock.
+            // ready the active_drv in this scenario. May readying the buffer prematurely but better than deadlock
+            lv_disp_flush_ready(active_drv);
         }
 #endif
 
