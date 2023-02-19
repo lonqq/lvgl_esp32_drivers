@@ -207,7 +207,7 @@ menu "LVGL TFT Display controller"
         help
             Display controller protocol I2C
 
-    menu "Parralel buf Configuration"
+    menu "Parralel bus Configuration"
     visible if LV_TFT_DISPLAY_PROTOCOL_MCU
 
         choice PARALLEL_BUS_WIDTH
@@ -240,7 +240,7 @@ menu "LVGL TFT Display controller"
         config LV_TFT_MCU_DATA1
             int "GPIO Num for DATA1"
         config LV_TFT_MCU_DATA2
-            int "GPIO Num for DATA3"
+            int "GPIO Num for DATA2"
         config LV_TFT_MCU_DATA3
             int "GPIO Num for DATA3"
         config LV_TFT_MCU_DATA4

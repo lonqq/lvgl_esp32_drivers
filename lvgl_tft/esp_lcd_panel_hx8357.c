@@ -147,7 +147,7 @@ static esp_err_t panel_hx8357_reset(esp_lcd_panel_t *panel)
     return ESP_OK;
 }
 
-static const uint8_t
+const uint8_t
   initb[] = {
     HX8357B_SETPOWER, 3,
       0x44, 0x41, 0x06,
@@ -215,13 +215,6 @@ static const uint8_t
       0x2A,                      // DUM
       0x0D,                      // GDON
       0x78,                      // GDOFF
-#if 0
-    HX8357D_SETGAMMA, 34,
-      0x02, 0x0A, 0x11, 0x1d, 0x23, 0x35, 0x41, 0x4b, 0x4b,
-      0x42, 0x3A, 0x27, 0x1B, 0x08, 0x09, 0x03, 0x02, 0x0A,
-      0x11, 0x1d, 0x23, 0x35, 0x41, 0x4b, 0x4b, 0x42, 0x3A,
-      0x27, 0x1B, 0x08, 0x09, 0x03, 0x00, 0x01,
-#endif
     HX8357_COLMOD, 1,
       0x55,                      // 16 bit
     HX8357_MADCTL, 1,
@@ -235,30 +228,32 @@ static const uint8_t
     0,                           // END OF COMMAND LIST
   };
 
-static uint8_t displayType = HX8357D;
+uint8_t displayType = HX8357D;
 static esp_err_t panel_hx8357_init(esp_lcd_panel_t *panel)
 {
     hx8357_panel_t *hx8357 = __containerof(panel, hx8357_panel_t, base);
     esp_lcd_panel_io_handle_t io = hx8357->io;
 
-	const uint8_t *addr = (displayType == HX8357B) ? initb : initd;
-	uint8_t        cmd, x, numArgs;
-	while((cmd = *addr++) > 0) { // '0' command ends list
-		x = *addr++;
-		numArgs = x & 0x7F;
-		if (cmd != 0xFF) { // '255' is ignored
-			if (x & 0x80) {  // If high bit set, numArgs is a delay time
+  	const uint8_t *addr = (displayType == HX8357B) ? initb : initd;
+	  uint8_t        cmd, x, numArgs;
+	  while((cmd = *addr++) > 0) { // '0' command ends list
+		    x = *addr++;
+		    numArgs = x & 0x7F;
+		    if (cmd != 0xFF) { // '255' is ignored
+			      if (x & 0x80) {  // If high bit set, numArgs is a delay time
                 esp_lcd_panel_io_tx_param(io, cmd, NULL, 0);
-			} else {
+			      } else {
                 esp_lcd_panel_io_tx_param(io, cmd, addr, numArgs);
-				addr += numArgs;
-			}
-		}
-		if (x & 0x80) {       // If high bit set...
-			vTaskDelay(numArgs * 5 / portTICK_RATE_MS); // numArgs is actually a delay time (5ms units)
-		}
-	}
+				        addr += numArgs;
+			      }
+		    }
+		    if (x & 0x80) {       // If high bit set...
+			      vTaskDelay(numArgs * 5 / portTICK_RATE_MS); // numArgs is actually a delay time (5ms units)
+		    }
+	  }
 
+    panel_hx8357_swap_xy(panel, true);
+    panel_hx8357_mirror(panel, true, false);
     return ESP_OK;
 }
 

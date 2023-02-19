@@ -18,7 +18,7 @@ static const char *TAG = "lcd-mcu";
 #include "lvgl_helpers.h"
 #include "disp_mcu.h"
 
-#define MCU_LCD_PIXEL_CLOCK_HZ (10 * 1000 * 1000) // TODO
+#define MCU_LCD_PIXEL_CLOCK_HZ (20 * 1000 * 1000) // TODO
 
 static esp_lcd_i80_bus_handle_t i80_bus = NULL;
 static esp_lcd_i80_bus_config_t bus_config = {
@@ -65,6 +65,13 @@ static esp_lcd_panel_io_i80_config_t io_config = {
         .dc_dummy_level = 0,
         .dc_data_level = 1,
     },
+    .flags = {
+        .cs_active_high = 0,
+        .reverse_color_bits = 0,
+        .swap_color_bytes = 1,
+        .pclk_active_neg = 0,
+        .pclk_idle_low = 0,
+    },
     .on_color_trans_done = mcu_notify_lvgl_flush_ready,
     .user_ctx = NULL,
 #if CONFIG_LV_TFT_LCD_CMD_WIDTH_16
@@ -100,7 +107,6 @@ void lcd_mcu_lvgl_flush_cb(lv_disp_drv_t *drv, const lv_area_t *area, lv_color_t
     int offsetx2 = area->x2;
     int offsety1 = area->y1;
     int offsety2 = area->y2;
-
     // copy a buffer's content to a specific area of the display
     esp_lcd_panel_draw_bitmap(panel_handle, offsetx1, offsety1, offsetx2 + 1, offsety2 + 1, color_map);
 }
@@ -121,7 +127,6 @@ void disp_mcu_panel_init(lv_disp_drv_t *disp_drv) {
 #endif
     esp_lcd_panel_reset(panel_handle);
     esp_lcd_panel_init(panel_handle);
-    esp_lcd_panel_invert_color(panel_handle, true);
     // the gap is LCD panel specific, even panels with the same driver IC, can have different gap value
     //esp_lcd_panel_set_gap(panel_handle, 0, 20);
 }
