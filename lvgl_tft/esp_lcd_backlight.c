@@ -49,22 +49,31 @@ disp_backlight_h disp_backlight_new(const disp_backlight_config_t *config)
         };
         const ledc_timer_config_t LCD_backlight_timer = {
             .speed_mode = LEDC_LOW_SPEED_MODE,
-            .bit_num = LEDC_TIMER_10_BIT,
+            .duty_resolution = LEDC_TIMER_8_BIT,
             .timer_num = config->timer_idx,
-            .freq_hz = 5000,
-            .clk_cfg = LEDC_AUTO_CLK};
+            .freq_hz = 50000, // make sure it is out of the range of my ears
+            .clk_cfg = LEDC_USE_RTC8M_CLK};
 
         ESP_ERROR_CHECK(ledc_timer_config(&LCD_backlight_timer));
         ESP_ERROR_CHECK(ledc_channel_config(&LCD_backlight_channel));
-        gpio_matrix_out(config->gpio_num, ledc_periph_signal[LEDC_LOW_SPEED_MODE].sig_out0_idx + config->channel_idx, config->output_invert, 0);
     }
     else
     {
         // Configure GPIO for output
         bckl_dev->index = config->gpio_num;
-        gpio_pad_select_gpio(config->gpio_num);
-        ESP_ERROR_CHECK(gpio_set_direction(config->gpio_num, GPIO_MODE_OUTPUT));
-        gpio_matrix_out(config->gpio_num, SIG_GPIO_OUT_IDX, config->output_invert, false);
+        gpio_config_t io_conf = {};
+        //disable interrupt
+        io_conf.intr_type = GPIO_INTR_DISABLE;
+        //set as output mode
+        io_conf.mode = GPIO_MODE_OUTPUT;
+        //bit mask of the pins that you want to set,e.g.GPIO18/19
+        io_conf.pin_bit_mask = (1ULL << config->gpio_num);
+        //disable pull-down mode
+        io_conf.pull_down_en = 0;
+        //disable pull-up mode
+        io_conf.pull_up_en = 0;
+        //configure GPIO with the given settings
+        gpio_config(&io_conf);
     }
 
     return (disp_backlight_h)bckl_dev;
@@ -84,7 +93,7 @@ void disp_backlight_set(disp_backlight_h bckl, int brightness_percent)
     ESP_LOGI(TAG, "Setting LCD backlight: %d%%", brightness_percent);
 
     if (bckl_dev->pwm_control) {
-        uint32_t duty_cycle = (1023 * brightness_percent) / 100; // LEDC resolution set to 10bits, thus: 100% = 1023
+        uint32_t duty_cycle = (255 * brightness_percent) / 100; // LEDC resolution set to 8bits, thus: 100% = 255
         ESP_ERROR_CHECK(ledc_set_duty(LEDC_LOW_SPEED_MODE, bckl_dev->index, duty_cycle));
         ESP_ERROR_CHECK(ledc_update_duty(LEDC_LOW_SPEED_MODE, bckl_dev->index));
     } else {
