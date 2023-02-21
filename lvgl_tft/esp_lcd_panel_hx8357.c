@@ -30,7 +30,7 @@ static esp_err_t panel_hx8357_invert_color(esp_lcd_panel_t *panel, bool invert_c
 static esp_err_t panel_hx8357_mirror(esp_lcd_panel_t *panel, bool mirror_x, bool mirror_y);
 static esp_err_t panel_hx8357_swap_xy(esp_lcd_panel_t *panel, bool swap_axes);
 static esp_err_t panel_hx8357_set_gap(esp_lcd_panel_t *panel, int x_gap, int y_gap);
-static esp_err_t panel_hx8357_disp_off(esp_lcd_panel_t *panel, bool off);
+static esp_err_t panel_hx8357_disp_on_off(esp_lcd_panel_t *panel, bool on_off);
 
 typedef struct {
     esp_lcd_panel_t base;
@@ -100,7 +100,7 @@ esp_err_t esp_lcd_new_panel_hx8357(const esp_lcd_panel_io_handle_t io, const esp
     hx8357->base.set_gap = panel_hx8357_set_gap;
     hx8357->base.mirror = panel_hx8357_mirror;
     hx8357->base.swap_xy = panel_hx8357_swap_xy;
-    hx8357->base.disp_off = panel_hx8357_disp_off;
+    hx8357->base.disp_on_off = panel_hx8357_disp_on_off;
     *ret_panel = &(hx8357->base);
     ESP_LOGD(TAG, "new hx8357 panel @%p", hx8357);
 
@@ -248,7 +248,7 @@ static esp_err_t panel_hx8357_init(esp_lcd_panel_t *panel)
 			      }
 		    }
 		    if (x & 0x80) {       // If high bit set...
-			      vTaskDelay(numArgs * 5 / portTICK_RATE_MS); // numArgs is actually a delay time (5ms units)
+			      vTaskDelay(numArgs * 5 / portTICK_PERIOD_MS); // numArgs is actually a delay time (5ms units)
 		    }
 	  }
 
@@ -345,12 +345,12 @@ static esp_err_t panel_hx8357_set_gap(esp_lcd_panel_t *panel, int x_gap, int y_g
     return ESP_OK;
 }
 
-static esp_err_t panel_hx8357_disp_off(esp_lcd_panel_t *panel, bool off)
+static esp_err_t panel_hx8357_disp_on_off(esp_lcd_panel_t *panel, bool on_off)
 {
     hx8357_panel_t *hx8357 = __containerof(panel, hx8357_panel_t, base);
     esp_lcd_panel_io_handle_t io = hx8357->io;
     int command = 0;
-    if (off) {
+    if (!on_off) {
         command = LCD_CMD_DISPOFF;
     } else {
         command = LCD_CMD_DISPON;

@@ -74,7 +74,7 @@ static inline void disp_spi_send_colors(uint8_t *data, size_t length) {
         NULL, 0, 0);
 }
 
-lv_disp_drv_t *active_drv;
+extern lv_disp_drv_t *active_drv;
 
 #ifdef __cplusplus
 } /* extern "C" */
