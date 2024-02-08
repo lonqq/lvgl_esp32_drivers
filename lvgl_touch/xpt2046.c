@@ -97,8 +97,8 @@ bool xpt2046_read(lv_indev_drv_t * drv, lv_indev_data_t * data)
         ESP_LOGI(TAG, "P(%d,%d)", x, y);
 
         /*Normalize Data back to 12-bits*/
-        x = x >> 4;
-        y = y >> 4;
+        x = x >> 3;
+        y = y >> 3;
         ESP_LOGI(TAG, "P_norm(%d,%d)", x, y);
         
         xpt2046_corr(&x, &y);
@@ -167,7 +167,6 @@ static void xpt2046_corr(int16_t * x, int16_t * y)
     *x = *y;
     *y = swap_tmp;
 #endif
-
     if((*x) > XPT2046_X_MIN)(*x) -= XPT2046_X_MIN;
     else(*x) = 0;
 

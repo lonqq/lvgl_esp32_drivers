@@ -178,7 +178,7 @@ extern "C" {
 #define SPI_TOUCH_CLOCK_SPEED_HZ    (1*1000*1000)
 #define SPI_TOUCH_SPI_MODE          (1)
 #else
-#define SPI_TOUCH_CLOCK_SPEED_HZ    (2*1000*1000)
+#define SPI_TOUCH_CLOCK_SPEED_HZ    (25*1000*1000 / 10)
 #define SPI_TOUCH_SPI_MODE          (0)
 #endif
 
