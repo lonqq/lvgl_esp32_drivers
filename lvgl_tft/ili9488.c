@@ -10,7 +10,7 @@
 #include "driver/gpio.h"
 #include "esp_log.h"
 #include "esp_heap_caps.h"
-
+#include "esp_debug_helpers.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
@@ -117,6 +117,7 @@ void ili9488_init(void)
 // Flush function based on mvturnho repo
 void ili9488_flush(lv_disp_drv_t * drv, const lv_area_t * area, lv_color_t * color_map)
 {
+	disp_wait_for_pending_transactions();
     uint32_t size = lv_area_get_width(area) * lv_area_get_height(area);
 
     lv_color16_t *buffer_16bit = (lv_color16_t *) color_map;
@@ -165,6 +166,7 @@ void ili9488_flush(lv_disp_drv_t * drv, const lv_area_t * area, lv_color_t * col
 
 	ili9488_send_color((void *) mybuf, size * 3);
 	//heap_caps_free(mybuf);
+	disp_wait_for_pending_transactions();
 }
 
 /**********************
